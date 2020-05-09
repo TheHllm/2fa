@@ -226,3 +226,13 @@ function addUrl(url){
     new TokenRenderer(topt).continuesUpdate();
     TOTP.saveAllTotps();    
 }
+
+//service worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/js/service-worker.js', {scope: '/'})
+    .then(function(registration) {
+    })
+    .catch(function(error) {
+      alert('Service worker registration failed, error: ' + error);
+    });
+  }
