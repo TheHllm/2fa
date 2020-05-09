@@ -1,0 +1,9 @@
+{
+    "compilerOptions": 
+    {
+        "target": "esnext",
+        "lib": ["DOM", "ES2018"],
+        "outDir": "../html/js",
+        "removeComments": true
+    }
+}

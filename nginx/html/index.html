@@ -1,0 +1,102 @@
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="js/sha.js"></script>
+    <script src="/js/index.js"></script>
+    <script type="module">
+        import QrScanner from '/js/qr-scanner.min.js';
+        QrScanner.WORKER_PATH = '/js/qr-scanner-worker.min.js';
+        var scanner;
+    QrScanner.hasCamera().then(function (has){
+        if(has || true){
+            var back = document.getElementById('totp-background');
+            var div = document.createElement('div');
+            div.classList.add('topt');
+            let btn = document.createElement('button');
+            btn.classList.add('btn');
+            btn.classList.add('btn-primary');
+            btn.style.width = '100%';
+            btn.innerText="Scan"
+
+            btn.addEventListener('click', function(){
+                var video = document.createElement('video');
+                document.body.appendChild(video);
+                btn.disabled = true;
+                scanner = new QrScanner(video, function (res){
+                    addUrl(res);
+                    scanner = null;
+                    btn.disabled = false;
+                    video.remove();
+                });
+                scanner.start();
+            });
+
+            div.appendChild(btn);
+            back.appendChild(div);
+        }
+    });
+
+    // remove elm
+    Element.prototype.remove = function() {
+        this.parentElement.removeChild(this);
+    }
+    NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+        for(var i = this.length - 1; i >= 0; i--) {
+            if(this[i] && this[i].parentElement) {
+                this[i].parentElement.removeChild(this[i]);
+            }
+        }
+    }
+
+    </script>
+    <style>
+        body{
+            user-select: none;
+            padding: 0px;
+            margin: 0px;
+            background-color: #ffffff;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .totp-background{
+            user-select: none;
+            background-color: #181818;
+            width: 100%;
+            padding: 1em 0em;
+            text-align: left;
+        }
+        .topt{
+            background-color: #1E1E1E;
+            margin-top: 1em;
+            padding: 0em 1em;
+        }
+        .totp-numbers{
+            color:#eeeeee;
+            font-size: x-large;
+            font-weight: 500;
+        }
+        .totp-label{
+            color:#bbbbbb;
+            font-weight: 400;
+        }
+
+        .clicky{
+            cursor:copy;
+        }
+        .clicky:active{
+            background-color: rgb(75, 75, 75);
+        }
+    </style>
+</head> 
+<body>
+    <div class="totp-background" id="totp-background">
+        <div id="totp-wrapper">
+            <h1 style="color: #eeeeee; padding-left: 5px;">Tokens</h1>
+            <hr style="border-color: #888888">
+        </div>
+        <hr style="border-color: #888888">
+        <div class="topt" style="width: 100%;">
+                <input id="url" style="width: calc(99% - 5em);float:left; margin-right: 1%;" type="text" class="form-control" placeholder="otpauth://totp/Example:alice@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example"></input><button class="btn btn-success" style="width: 5em;" onclick="addBtn()">Add</button>
+        </div>
+    </div>
+</body>
+</html>
