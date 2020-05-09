@@ -178,3 +178,11 @@ function addUrl(url) {
     new TokenRenderer(topt).continuesUpdate();
     TOTP.saveAllTotps();
 }
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/js/service-worker.js')
+        .then(function (registration) {
+    })
+        .catch(function (error) {
+        alert('Service worker registration failed, error: ' + error);
+    });
+}
