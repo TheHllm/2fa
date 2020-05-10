@@ -40,6 +40,12 @@ class TOTP {
             }
         }
     }
+    public static removeTotp(x: TOTP){
+        TOTP.totps = TOTP.totps.filter(q => q.url !== x.url);
+    }
+    public static hashUrl(url:string):boolean{
+        return TOTP.totps.some(q => q.url === url);
+    }
 
     public key: string;
     public shaObj: any;
@@ -55,6 +61,10 @@ class TOTP {
         this.url = _url;
         var urlObj = new URL(this.url);
         //sanety check
+        if(urlObj.protocol === 'web+otpauth:'){
+            this.url = this.url.substring(4); //chop off the web-
+            urlObj = new URL(this.url); //recreate the url obj
+        }
         if(urlObj.protocol !== 'otpauth:'){
             throw "protocol mismatch";
         }
@@ -72,6 +82,7 @@ class TOTP {
         if(secret === null){
             throw "secret is missing";
         }
+        //debugger;
         this.key = this.base32tohex(secret);
         this.issuer = urlObj.searchParams.get('issuer') || this.issuer;
         this.algo = AlgorithmsMaper.getAlgoFromUri(urlObj.searchParams.get('algorithm') || "") || Algorithms.sha1;
@@ -119,6 +130,13 @@ class TOTP {
         var time = this.leftpad(this.dec2hex(this.getTimeNumber()), 16, '0');
         //set sha
         var shaObj = new jsSHA(AlgorithmsMaper.getJsFromAlog(this.algo), "HEX");
+        var hex = this.key;
+        console.log(hex.length);
+        if(hex.length ==65){
+            debugger;
+        }
+        hex = hex.substring(0, hex.length - (hex.length % 2));
+        //console.log(hex);
         shaObj.setHMACKey(this.key, "HEX");
         shaObj.update(time);
         var hmac = shaObj.getHMAC("HEX");
@@ -136,8 +154,20 @@ class TOTP {
         elm.src = src;
         return elm;
     }
+
+    private static makeQrUrl(url){
+        var qr = eval("qrcode(0, 'H')");
+        qr.addData(url);
+        qr.make();
+        return qr.createBlobUrl(5,5);
+    }
+
+    public getWebQrUrl():string{
+        return TOTP.makeQrUrl("web+" + this.url);
+    }
+
     public getQrUrl():string{
-        return 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=200x200&chld=M|0&cht=qr&chl=' + this.url;
+        return TOTP.makeQrUrl(this.url);
     }
 
     public getDisplayLabel():string{
@@ -167,20 +197,47 @@ class TokenRenderer{
             navigator.clipboard.writeText(token);
         });
         let t = this;
-        div.addEventListener('contextmenu', function(e){
-            e.preventDefault();
-            e.stopPropagation();
-            window.open(t.totp.getQrUrl());
-        })
 
-        
 
         this.number = document.createElement('div');
         this.number.classList.add('totp-numbers');
         this.label = document.createElement('div');
         this.label.classList.add('totp-label');
         this.label.innerHTML = this.totp.getDisplayLabel();
+        //delete
+        var trash = document.createElement('img');
+        trash.classList.add('icon');
+        trash.src = "/assets/images/svg/trashcan.svg";
+        trash.addEventListener('click', function (e){
+            e.stopPropagation();
+            if(window.confirm('Do you want to delete ' + t.totp.getDisplayLabel() + "?")){
+                debugger;
+                TOTP.removeTotp(t.totp);
+                TOTP.saveAllTotps();
+                location.reload();
+            }
+        });
 
+        //exports
+        var ex = document.createElement('img');
+        ex.classList.add('icon');
+        ex.src = "/assets/images/svg/link-external.svg";
+        ex.addEventListener('click', function (e){
+            e.stopPropagation();
+            window.open(t.totp.getQrUrl(), '_self');
+        });
+        var ex2 = document.createElement('img');
+        ex2.classList.add('icon');
+        ex2.src = "/assets/images/svg/link-external-green.svg";
+        ex2.addEventListener('click', function (e){
+            e.stopPropagation();
+            window.open(t.totp.getWebQrUrl(), '_self');
+        });
+
+        
+        div.appendChild(trash);
+        div.appendChild(ex);
+        div.appendChild(ex2);
         div.appendChild(this.number);
         div.appendChild(this.label);
         document.getElementById('totp-wrapper').appendChild(div);
@@ -217,20 +274,58 @@ function addBtn(){
             inputelm.value = "";
         }
     }catch(e){
+        throw e;
         alert(e);
     }
 }
 function addUrl(url){
     //try to create a topt
-    var topt = new TOTP(url);
-    new TokenRenderer(topt).continuesUpdate();
-    TOTP.saveAllTotps();    
+    if(!TOTP.hashUrl(url)){
+        var topt = new TOTP(url);
+        new TokenRenderer(topt).continuesUpdate();
+        TOTP.saveAllTotps();   
+    } 
 }
+
+class SWVersion{
+    public static version: string = '3';
+    public static alwaysUpdate: boolean = true;
+    public static getVersion():string{
+        return window.localStorage.getItem('version') || '0';
+    }
+    public static needsUpdate():boolean{
+        return this.getVersion() !== SWVersion.version || SWVersion.alwaysUpdate;
+    }
+    public static setVersionToCurrent(){
+        window.localStorage.setItem('version', SWVersion.version);
+    }
+    public static isFirstLoad(){
+        var is = window.localStorage.getItem('installed') == null;
+        window.localStorage.setItem('installed', 'true');
+        return is;
+    }
+}
+if(SWVersion.isFirstLoad()){
+    setTimeout( function (){navigator.registerProtocolHandler("web+otpauth", location.origin + "#%s", "otpauth");}, 1000);
+}
+//mangage web+otpauth
+var indexOf = location.href.lastIndexOf('#');
+if(indexOf !== -1){
+    let toBeAdded = location.href.substring(indexOf);
+    setTimeout(function (){addUrl(toBeAdded);}, 1000);
+}
+
+
 
 //service worker
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/js/service-worker.js', {scope: '/'})
     .then(function(registration) {
+        if(SWVersion.needsUpdate()){
+            console.log("update");
+            registration.update();
+            SWVersion.setVersionToCurrent();
+        }
     })
     .catch(function(error) {
       alert('Service worker registration failed, error: ' + error);

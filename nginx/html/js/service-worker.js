@@ -6,6 +6,9 @@ self.addEventListener('install', function (e) {
         return cache.addAll([
             '/',
             '/favicon.ico',
+            '/assets/images/svg/trashcan.svg',
+            '/assets/images/svg/link-external.svg',
+            '/assets/images/svg/link-external-green.svg',
             '/js/index.js',
             '/js/qr-scanner.min.js',
             '/js/qr-scanner-worker.min.js',
