@@ -131,12 +131,7 @@ class TOTP {
         //set sha
         var shaObj = new jsSHA(AlgorithmsMaper.getJsFromAlog(this.algo), "HEX");
         var hex = this.key;
-        console.log(hex.length);
-        if(hex.length ==65){
-            debugger;
-        }
         hex = hex.substring(0, hex.length - (hex.length % 2));
-        //console.log(hex);
         shaObj.setHMACKey(this.key, "HEX");
         shaObj.update(time);
         var hmac = shaObj.getHMAC("HEX");
@@ -193,7 +188,6 @@ class TokenRenderer{
         let x = this;
         div.addEventListener('click', function (e){
             var token = x.totp.getToken();
-            console.log(token);
             navigator.clipboard.writeText(token);
         });
         let t = this;
@@ -211,7 +205,6 @@ class TokenRenderer{
         trash.addEventListener('click', function (e){
             e.stopPropagation();
             if(window.confirm('Do you want to delete ' + t.totp.getDisplayLabel() + "?")){
-                debugger;
                 TOTP.removeTotp(t.totp);
                 TOTP.saveAllTotps();
                 location.reload();
@@ -274,7 +267,6 @@ function addBtn(){
             inputelm.value = "";
         }
     }catch(e){
-        throw e;
         alert(e);
     }
 }
@@ -322,7 +314,6 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/js/service-worker.js', {scope: '/'})
     .then(function(registration) {
         if(SWVersion.needsUpdate()){
-            console.log("update");
             registration.update();
             SWVersion.setVersionToCurrent();
         }
