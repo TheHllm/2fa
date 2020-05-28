@@ -300,6 +300,7 @@ class SWVersion{
 if(SWVersion.isFirstLoad()){
     setTimeout( function (){navigator.registerProtocolHandler("web+otpauth", location.origin + "#%s", "otpauth");}, 1000);
 }
+//TODO: register to optaith:// (currently not supported by any browsers)
 //mangage web+otpauth
 var indexOf = location.href.lastIndexOf('#');
 if(indexOf !== -1){

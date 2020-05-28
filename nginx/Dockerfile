@@ -19,4 +19,3 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY html /usr/local/nginx/html
 #copy tsc output
 COPY --from=compile /app/html/js /usr/local/nginx/html/js
-RUN ls /usr/local/nginx/html/js

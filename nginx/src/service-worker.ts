@@ -1,7 +1,9 @@
+
 self.addEventListener('activate', function(event) {
     console.log('activated');
 });
 
+//put files into cache
 self.addEventListener('install', function(e: any) {
     e.waitUntil(
         caches.open('static').then(function(cache) {
@@ -20,6 +22,7 @@ self.addEventListener('install', function(e: any) {
     );
 });
 
+//serve files
 
 self.addEventListener('fetch', function(event: any) {
     event.respondWith(
