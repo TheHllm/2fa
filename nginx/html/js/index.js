@@ -250,7 +250,7 @@ if (indexOf !== -1) {
     setTimeout(function () { addUrl(toBeAdded); }, 1000);
 }
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/js/service-worker.js', { scope: '/' })
+    navigator.serviceWorker.register(self.location.hostname.includes("github.io") ? '/service-worker.js' : '/js/service-worker.js', { scope: '/' })
         .then(function (registration) {
         if (SWVersion.needsUpdate()) {
             registration.update();
