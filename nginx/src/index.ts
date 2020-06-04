@@ -312,7 +312,7 @@ if(indexOf !== -1){
 
 //service worker
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register(self.location.hostname.includes("github.io") ? '/service-worker.js':'/js/service-worker.js', {scope: '/'})
+    navigator.serviceWorker.register(self.location.hostname.includes("github.io") ? '/2fa/service-worker.js':'/js/service-worker.js', {scope: '/'})
     .then(function(registration) {
         if(SWVersion.needsUpdate()){
             registration.update();
