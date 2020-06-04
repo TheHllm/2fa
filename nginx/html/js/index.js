@@ -250,7 +250,8 @@ if (indexOf !== -1) {
     setTimeout(function () { addUrl(toBeAdded); }, 1000);
 }
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register(self.location.hostname.includes("github.io") ? '/2fa/service-worker.js' : '/js/service-worker.js', { scope: '/' })
+    var isgit = self.location.hostname.includes("github.io");
+    navigator.serviceWorker.register(isgit ? '/2fa/service-worker.js' : '/js/service-worker.js', { scope: isgit ? '2fa' : '/' })
         .then(function (registration) {
         if (SWVersion.needsUpdate()) {
             registration.update();
