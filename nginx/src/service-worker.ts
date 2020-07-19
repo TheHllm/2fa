@@ -7,16 +7,18 @@ self.addEventListener('activate', function(event) {
 self.addEventListener('install', function(e: any) {
     e.waitUntil(
         caches.open('static').then(function(cache) {
+            //use diffrent path if running on github: /2fa/nginx/html/
+            var prepend = self.location.hostname.includes("github.io") ? "/2fa/nginx/html/" : "";
             return cache.addAll([
-            '/',
-            '/favicon.ico',
-            '/assets/images/svg/trashcan.svg',
-            '/assets/images/svg/link-external.svg',
-            '/assets/images/svg/link-external-green.svg',
-            '/js/index.js',
-            '/js/qr-scanner.min.js',
-            '/js/qr-scanner-worker.min.js',
-            '/index.html',
+                prepend + '/',
+                prepend + '/favicon.ico',
+                prepend + '/assets/images/svg/trashcan.svg',
+                prepend + '/assets/images/svg/link-external.svg',
+                prepend + '/assets/images/svg/link-external-green.svg',
+                prepend + '/js/index.js',
+                prepend + '/js/qr-scanner.min.js',
+                prepend + '/js/qr-scanner-worker.min.js',
+                prepend + '/index.html',
             ])
         })
     );
