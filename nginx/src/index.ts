@@ -300,20 +300,19 @@ class SWVersion{
 if(SWVersion.isFirstLoad()){
     setTimeout( function (){navigator.registerProtocolHandler("web+otpauth", location.origin + "#%s", "otpauth");}, 1000);
 }
-//TODO: register to optaith:// (currently not supported by any browsers)
+//TODO: register to optaith:// (currently not allowed by any browsers)
 //mangage web+otpauth
 var indexOf = location.href.lastIndexOf('#');
 if(indexOf !== -1){
     let toBeAdded = location.href.substring(indexOf);
-    setTimeout(function (){addUrl(toBeAdded);}, 1000);
+    setTimeout(function (){addUrl(toBeAdded);}, 1000); //hacky way of making shure that all the other things are loaded, maybe set a flag.
 }
 
 
 
 //service worker
 if ('serviceWorker' in navigator) {
-    var isgit = self.location.hostname.includes("github.io");
-    navigator.serviceWorker.register(isgit ? '/2fa/service-worker.js':'/js/service-worker.js', {scope: isgit ? '2fa' : '/'})
+    navigator.serviceWorker.register('/js/service-worker.js', {scope: '/'})
     .then(function(registration) {
         if(SWVersion.needsUpdate()){
             registration.update();
