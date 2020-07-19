@@ -4,6 +4,13 @@ A slimm PWA for managing TOTP-secrets. It supports scanning of QR-codes and
 exporing of TOTP-secres via QR-codes.
 The app can be installed and is fully avalible offline.
 
+![Screenshot](screenshot.png)
+
+## Features
+- The website has a manifest and can be installed.
+- The website is availible offline.
+- TOPT secrets can be exported.
+- Qrcodes can be scanned and added.
 
 ## Security
 Everything is stored on the client, at no point are any secrets on any server,
