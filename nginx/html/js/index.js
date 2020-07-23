@@ -42,6 +42,9 @@ class TOTP {
         if (secret === null) {
             throw "secret is missing";
         }
+        if (secret.length % 8 !== 0) {
+            secret += "A".repeat(8 - secret.length % 8);
+        }
         this.key = this.base32tohex(secret);
         this.issuer = urlObj.searchParams.get('issuer') || this.issuer;
         this.algo = AlgorithmsMaper.getAlgoFromUri(urlObj.searchParams.get('algorithm') || "") || Algorithms.sha1;
